@@ -50,8 +50,9 @@ function parse(line::AbstractString)
         return parse_ZDA(items, system)
     elseif (occursin(r"PASHR$", items[1]))
         return parse_PASHR(items, system)
+    else
+        return parse_Unknown(items,system)
     end
-
     throw(ArgumentError("NMEA string not supported"))
 
 end
@@ -377,6 +378,13 @@ mutable struct PASHR
     end
 
 end # type PASHR
+
+mutable struct UnknownNMEASentence
+    system
+    sentence
+    data
+    valid
+end
 
 #----------
 # module handler
@@ -737,6 +745,10 @@ function parse_PASHR(items::Array{T}, system::AbstractString) where T<:SubString
     end
     PASHR_data.valid = true
     PASHR_data
+end
+
+function parse_Unknown(items::Array{T}, system::AbstractString) where T <: SubString    
+    UnknownNMEASentence(system,items[1][4:end],items[2:end],true)
 end
 
 #----------
