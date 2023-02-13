@@ -381,7 +381,7 @@ end # type PASHR
 
 mutable struct UnknownNMEASentence
     system
-    sentence
+    sentence_code
     data
     valid
 end
