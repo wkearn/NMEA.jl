@@ -19,11 +19,13 @@ function parse(line::AbstractString)
 
     message, checksum  = split(line, '*')
 
-    if checksum!=xor(Vector{UInt8}(split(message,"\$")[2])...)
-        @warn "Message checksum mismatch"
-        # print(message)
-        # print(Char(checksum))
-        # print(Char(xor(Vector{UInt8}(split(message,"\$")[2])...)))
+    checksum_p = tryparse(UInt8,checksum,base=16)
+
+    message_checksum = reduce(xor,Vector{UInt8}(split(message,"\$")[2]))
+    if checksum_p == nothing
+        @warn "Invalid checksum detected ($checksum), checksum validation skipped."
+    elseif checksum_p != message_checksum
+        @warn "Message checksum ($(string(message_checksum,base=16))) does not match supplied checksum ($(string(checksum_p,base=16)))"
     end
 
     items = split(message, ',')

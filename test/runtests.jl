@@ -35,9 +35,11 @@ for line = readlines(f)
     end
 end
 
-
-example = NMEA.parse(raw"$GPGGA,134740.000,5540.3248,N,01231.2992,E,1,09,0.9,20.2,M,41.5,M,,0000*61")
+example = @test_nowarn NMEA.parse(raw"$GPGGA,134740.000,5540.3248,N,01231.2992,E,1,09,0.9,20.2,M,41.5,M,,0000*61")
 @test(example.latitude == 55.67208)
 
-example = NMEA.parse("\$GNGGA,033158.447,4532.5164,N,12258.1463,W,1,9,1.25,161.5,M,-19.6,M,,*7E")
+example = @test_nowarn NMEA.parse("\$GNGGA,033158.447,4532.5164,N,12258.1463,W,1,9,1.25,161.5,M,-19.6,M,,*7E")
 @test(example.longitude == -122.969105)
+
+@test_warn "Message checksum" NMEA.parse(raw"$GPGGA,134740.000,5540.3248,N,01231.2992,E,1,09,0.9,20.2,M,41.5,M,,0000*62")
+@test_warn "Invalid checksum" NMEA.parse(raw"$GPGGA,134740.000,5540.3248,N,01231.2992,E,1,09,0.9,20.2,M,41.5,M,,0000*6G")
